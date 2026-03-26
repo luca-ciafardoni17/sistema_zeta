@@ -1,0 +1,17 @@
+package com.platformzeta.user.exceptions;
+
+import java.util.Map;
+
+public class RegistrationValidationException extends RuntimeException {
+
+    private final Map<String, String> errors;
+
+    public RegistrationValidationException(Map<String,String> errors) {
+        super("Registration validation failed. Err: " + errors);
+        this.errors = errors;
+    }
+
+    public Map<String, String> getErrors() {
+        return errors;
+    }
+}

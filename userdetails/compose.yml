@@ -1,0 +1,11 @@
+services:
+  dbservice:
+    image: mysql:latest
+    container_name: zeta_userdetails
+    ports:
+      - "3308:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zeta_userdetails
+    volumes:
+      - C:/Users/Lumca/Desktop/coding/spring-boot/zeta-userdetails:/var/lib/mysql

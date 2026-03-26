@@ -1,0 +1,129 @@
+services:
+  # ------------ Database ------------ #
+  storage-db:
+    image: postgres:latest
+    container_name: zeta_storage
+    environment:
+      POSTGRES_DB: zeta_storage
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - storage_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d zeta_storage"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zeta-net
+  user-db:
+    image: mysql:latest
+    container_name: zeta_user
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zeta_user
+    ports:
+      - "3307:3306"
+    volumes:
+      - user_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zeta-net
+  userdetails-db:
+    image: mysql:latest
+    container_name: zeta_userdetails
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: zeta_userdetails
+    ports:
+      - "3308:3306"
+    volumes:
+      - userdetails_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zeta-net
+
+  # ------------ Kafka ------------ #
+  zookeeper:
+    image: confluentinc/cp-zookeeper:latest
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    networks:
+      - zeta-net
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - zeta-net
+
+  # ------------ Microservizi ------------ #
+  storage:
+    build: ./storage
+    ports:
+      - "8082:8082"
+    environment:
+      - DATABASE_HOST=storage-db
+      - DATABASE_PORT=5432
+    depends_on:
+      storage-db:
+        condition: service_healthy
+    networks:
+      - zeta-net
+  user:
+    build: ./user
+    ports:
+      - "8081:8081"
+    environment:
+      - DATABASE_HOST=user-db
+      - DATABASE_PORT=3306
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      user-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - zeta-net
+  userdetails:
+    build: ./userdetails
+    ports:
+      - "8083:8083"
+    environment:
+      - DATABASE_HOST=userdetails-db
+      - DATABASE_PORT=3306
+      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
+    depends_on:
+      userdetails-db:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+    networks:
+      - zeta-net
+
+volumes:
+  storage_data:
+  user_data:
+  userdetails_data:
+
+networks:
+  zeta-net:
+    driver: bridge

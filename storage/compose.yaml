@@ -1,0 +1,12 @@
+services:
+  dbservice:
+    image: postgres:latest
+    container_name: zeta_storage
+    ports:
+      - "3308:5432"
+    environment:
+      POSTGRES_DB: zeta_storage
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    volumes:
+      - C:/Users/Lumca/Desktop/coding/spring-boot/zeta_storage:/var/lib/postgresql
