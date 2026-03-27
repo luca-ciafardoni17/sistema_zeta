@@ -4,10 +4,12 @@ import com.platformzeta.storage.dto.StoredFileDetailsDto;
 import com.platformzeta.storage.dto.StoredFileDto;
 import com.platformzeta.storage.dto.StoredFileRequestDto;
 import com.platformzeta.storage.entity.StoredFile;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.time.Instant;
+import java.util.Objects;
 
 public class TransformUtils {
 
@@ -22,6 +24,8 @@ public class TransformUtils {
                 throw new RuntimeException("Failed to upload file: ", e);
             }
         }
+        Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
+        storedFile.setUserId(userId);
         storedFile.setFileTitle(storedFileRequestDto.fileTitle());
         storedFile.setFileDescription(storedFileRequestDto.fileDescription());
         storedFile.setCreatedBy(email);

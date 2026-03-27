@@ -1,7 +1,7 @@
 services:
   dbservice:
     image: postgres:latest
-    container_name: zeta_storage
+    container_name: zeta_storage_ms
     ports:
       - "3308:5432"
     environment:

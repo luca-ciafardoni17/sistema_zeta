@@ -54,23 +54,14 @@ services:
       - zeta-net
 
   # ------------ Kafka ------------ #
-  kafka:
-    image: confluentinc/cp-kafka:latest
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_NODE_ID: 1
-      KAFKA_PROCESS_ROLES: broker,controller
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
-      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT
-      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_LOG_DIRS: /var/lib/kafka/data
-      CLUSTER_ID: "some-cluster-id"
-    networks:
-      - zeta-net
+  # kafka:
+  #  image: confluentinc/cp-kafka:latest
+  #  ports:
+  #    - "9092:9092"
+  #  environment:
+  #    KAFKA_NODE_ID: ...
+  #  networks:
+  #    - zeta-net
 
   # ------------ Microservizi ------------ #
   storage:
@@ -92,12 +83,9 @@ services:
     environment:
       - DATABASE_HOST=user-db
       - DATABASE_PORT=3306
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       user-db:
         condition: service_healthy
-      kafka:
-        condition: service_started
     networks:
       - zeta-net
   userdetails:
@@ -107,12 +95,9 @@ services:
     environment:
       - DATABASE_HOST=userdetails-db
       - DATABASE_PORT=3306
-      - SPRING_KAFKA_BOOTSTRAP_SERVERS=kafka:9092
     depends_on:
       userdetails-db:
         condition: service_healthy
-      kafka:
-        condition: service_started
     networks:
       - zeta-net
 

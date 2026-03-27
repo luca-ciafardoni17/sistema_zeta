@@ -29,5 +29,20 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body("User with email " + user.getEmail() + " created successfully!");
     }
 
+    @PutMapping("")
+    public ResponseEntity<LoginResponseDto> updateCredentials(
+            @RequestPart(value = "oldCredentials") String oldCredentialsJson,
+            @RequestPart(value = "newCredentials") String newCredentialsJson
+    ) {
+        LoginResponseDto newCredLoginResponseDto = userService.updateCredentials(oldCredentialsJson, newCredentialsJson);
+        return ResponseEntity.status(HttpStatus.OK).body(newCredLoginResponseDto);
+    }
+
+    @DeleteMapping("")
+    public ResponseEntity<String> deleteUser(@RequestBody LoginRequestDto credentials) {
+        userService.deleteUser(credentials);
+        return ResponseEntity.status(HttpStatus.OK).body("User " + credentials.email() + " deleted successfully");
+    }
+
 }
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 @Repository
 public interface StoredFileRepository extends JpaRepository<StoredFile, Long> {
-    List<StoredFile> findByEmail(String email);
+    List<StoredFile> findByUserId(Long userId);
 
     @Modifying(clearAutomatically = true)
     @Query("""
@@ -53,16 +53,5 @@ public interface StoredFileRepository extends JpaRepository<StoredFile, Long> {
             @Param("file_description") String fileDescription,
             @Param("updated_at") Instant updatedAt,
             @Param("updated_by") String updatedBy
-    );
-
-    @Modifying(clearAutomatically = true)
-    @Query("""
-        UPDATE StoredFile s SET 
-            s.email = :email
-        WHERE s.user_id = :userId
-    """)
-    int updateStoredFileAssociatedEmail(
-            @Param("user_id") Long userId,
-            @Param("email") String email
     );
 }

@@ -30,7 +30,7 @@ public class StoredFileServiceImpl implements IStoredFileService {
     @Override
     @Transactional
     public boolean createStoredFile(String storedFileRequestJson, MultipartFile file) {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         if (!email.endsWith("@aruba.it")) {
             return false;
         }
@@ -57,8 +57,8 @@ public class StoredFileServiceImpl implements IStoredFileService {
 
     @Override
     public Optional<List<StoredFileDetailsDto>> getStoredFilesDetail() {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
-        List<StoredFile> storedFiles = storedFileRepository.findByEmail(email);
+        Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
+        List<StoredFile> storedFiles = storedFileRepository.findByUserId(userId);
         return Optional.of(
                 storedFiles.stream()
                         .map(TransformUtils::transformEntityToDtoDetails)
@@ -76,7 +76,7 @@ public class StoredFileServiceImpl implements IStoredFileService {
         }
         ObjectMapper objectMapper = new ObjectMapper();
         StoredFileRequestDto storedFileRequestDto = objectMapper.readValue(storedFileRequestJson, StoredFileRequestDto.class);
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getCredentials()).toString();
+        String email = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
         if (file != null) {
             try {
                 return storedFileRepository.updateStoredFile(
