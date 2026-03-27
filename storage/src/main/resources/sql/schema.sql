@@ -1,6 +1,6 @@
 CREATE TABLE  IF NOT EXISTS stored_files (
     id BIGSERIAL PRIMARY KEY,
-    email VARCHAR(255),
+    user_id BIGSERIAL,
     file_title VARCHAR(255),
     file_description VARCHAR(500),
     file_name VARCHAR(255),

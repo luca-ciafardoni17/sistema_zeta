@@ -3,8 +3,11 @@ package com.platformzeta.user.service.impl;
 import com.platformzeta.user.config.security.JwtUtil;
 import com.platformzeta.user.dto.LoginRequestDto;
 import com.platformzeta.user.dto.LoginResponseDto;
+import com.platformzeta.user.dto.RegisterRequestDto;
 import com.platformzeta.user.dto.UserDto;
 import com.platformzeta.user.entity.User;
+import com.platformzeta.user.kafka.UserEventProducer;
+import com.platformzeta.user.kafka.event.UserRegisteredEvent;
 import com.platformzeta.user.repository.UserRepository;
 import com.platformzeta.user.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -28,6 +31,7 @@ public class UserServiceImpl implements IUserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final AuthenticationManager authenticationManager;
+    private final UserEventProducer userEventProducer;
     private final JwtUtil jwtUtil;
 
     @Override
@@ -54,27 +58,33 @@ public class UserServiceImpl implements IUserService {
     }
 
     @Override
-    public User registerUser(UserDto userDto) {
-        if (!userDto.getEmail().split("@")[1].equals("aruba.it")) {
+    public User registerUser(RegisterRequestDto registerRequestDto) {
+        if (!registerRequestDto.email().split("@")[1].equals("aruba.it")) {
             throw new RuntimeException("Email domain must be aruba.it");
         }
-        Optional<User> existingUser = userRepository.findByEmailOrMobileNumber(userDto.getEmail(), userDto.getMobileNumber());
+        Optional<User> existingUser = userRepository.findByEmail(registerRequestDto.email());
         if (existingUser.isPresent()) {
-            Map<String, String> errors = new HashMap<>();
             User user = existingUser.get();
-            if (user.getEmail().equals(userDto.getEmail())) {
-                errors.put("email", "Email is already registered");
+            if (user.getEmail().equals(registerRequestDto.email())) {
+                throw new RuntimeException("Email already registered!");
             }
-            if (user.getMobileNumber().equals(userDto.getMobileNumber())) {
-                errors.put("mobileNumber", "Mobile number is already registered");
-            }
-            throw new RuntimeException("Registration request refused:" + errors);
         }
         User user = new User();
-        BeanUtils.copyProperties(userDto, user);
-        user.setPasswordHash(passwordEncoder.encode(userDto.getPassword()));
+        BeanUtils.copyProperties(registerRequestDto, user);
+        user.setPasswordHash(passwordEncoder.encode(registerRequestDto.password()));
         user.setCreatedBy("REGISTER FORM");
-        return userRepository.save(user);
+        User savedUser = userRepository.save(user);
+        UserRegisteredEvent event = new UserRegisteredEvent(
+                registerRequestDto.email(),
+                registerRequestDto.accountHolder(),
+                registerRequestDto.taxCode(),
+                registerRequestDto.country(),
+                registerRequestDto.province(),
+                registerRequestDto.town(),
+                registerRequestDto.address()
+        );
+        userEventProducer.publishUserRegistered(event);
+        return savedUser;
     }
 
 }

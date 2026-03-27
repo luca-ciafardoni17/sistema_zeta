@@ -54,4 +54,15 @@ public interface StoredFileRepository extends JpaRepository<StoredFile, Long> {
             @Param("updated_at") Instant updatedAt,
             @Param("updated_by") String updatedBy
     );
+
+    @Modifying(clearAutomatically = true)
+    @Query("""
+        UPDATE StoredFile s SET 
+            s.email = :email
+        WHERE s.user_id = :userId
+    """)
+    int updateStoredFileAssociatedEmail(
+            @Param("user_id") Long userId,
+            @Param("email") String email
+    );
 }

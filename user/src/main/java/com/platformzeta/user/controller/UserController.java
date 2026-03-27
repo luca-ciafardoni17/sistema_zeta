@@ -2,7 +2,7 @@ package com.platformzeta.user.controller;
 
 import com.platformzeta.user.dto.LoginRequestDto;
 import com.platformzeta.user.dto.LoginResponseDto;
-import com.platformzeta.user.dto.UserDto;
+import com.platformzeta.user.dto.RegisterRequestDto;
 import com.platformzeta.user.entity.User;
 import com.platformzeta.user.service.IUserService;
 import lombok.RequiredArgsConstructor;
@@ -24,8 +24,8 @@ public class UserController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> apiRegister(@RequestBody UserDto userDto) {
-        User user = userService.registerUser(userDto);
+    public ResponseEntity<String> apiRegister(@RequestBody RegisterRequestDto registerRequestDto) {
+        User user = userService.registerUser(registerRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("User with email " + user.getEmail() + " created successfully!");
     }
 

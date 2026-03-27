@@ -43,9 +43,9 @@ public class StoredFileServiceImpl implements IStoredFileService {
 
     @Override
     public Optional<?> getStoredFile(Long id, Boolean binaryData) {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         StoredFile storedFile = storedFileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found"));
-        if (!email.equals(storedFile.getEmail())) {
+        if (userId != storedFile.getUserId()) {
             throw new RuntimeException("Current user is not authorized to download requested file!");
         }
         if (binaryData) {
@@ -69,13 +69,14 @@ public class StoredFileServiceImpl implements IStoredFileService {
     @Override
     @Transactional
     public boolean modifyStoredFile(Long id, String storedFileRequestJson, MultipartFile file) {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         StoredFile foundStoredFile = storedFileRepository.findById(id).orElseThrow(() -> new RuntimeException("No file found for given id: " + id));
-        if (!email.equals(foundStoredFile.getEmail())) {
+        if (userId != foundStoredFile.getUserId()) {
             throw new RuntimeException("Current user is not authorized to modify this file");
         }
         ObjectMapper objectMapper = new ObjectMapper();
         StoredFileRequestDto storedFileRequestDto = objectMapper.readValue(storedFileRequestJson, StoredFileRequestDto.class);
+        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication().getCredentials()).toString();
         if (file != null) {
             try {
                 return storedFileRepository.updateStoredFile(
@@ -105,9 +106,9 @@ public class StoredFileServiceImpl implements IStoredFileService {
     @Override
     @Transactional
     public void deleteStoredFile(Long id) {
-        String email = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
+        Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         StoredFile storedFile = storedFileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found!"));
-        if (!email.equals(storedFile.getEmail())) {
+        if (userId != storedFile.getUserId()) {
             throw new RuntimeException("Current user is not authorized to delete this file");
         }
         storedFileRepository.delete(storedFile);

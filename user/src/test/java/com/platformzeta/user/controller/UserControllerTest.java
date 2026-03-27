@@ -3,6 +3,7 @@ package com.platformzeta.user.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.platformzeta.user.dto.LoginRequestDto;
 import com.platformzeta.user.dto.LoginResponseDto;
+import com.platformzeta.user.dto.RegisterRequestDto;
 import com.platformzeta.user.dto.UserDto;
 import com.platformzeta.user.entity.User;
 import com.platformzeta.user.service.IUserService;
@@ -50,8 +51,17 @@ public class UserControllerTest {
     void apiLogin_ShouldReturnSuccess_WhenCredentialsAreCorrect() throws Exception {
         LoginRequestDto request = new LoginRequestDto("mario.rossi@aruba.it", "securePassword123");
         UserDto userDetails = new UserDto();
-        userDetails.setEmail("mario.rossi@aruba.it");
-        userDetails.setAccountHolder("Mario Rossi");
+        RegisterRequestDto registrationDto = new RegisterRequestDto(
+                "mario.rossi@aruba.it",
+                null,
+                null,
+                "Mario Rossi",
+                null,
+                null,
+                null,
+                null,
+                null
+        );
         LoginResponseDto response = new LoginResponseDto(
                 "Login effettuato con successo",
                 userDetails,
@@ -67,11 +77,20 @@ public class UserControllerTest {
 
     @Test
     void apiRegister_ShouldReturnCreated_WhenUserDtoIsValid() throws Exception {
-        UserDto registrationDto = new UserDto();
-        registrationDto.setEmail("new@platformzeta.com");
+        RegisterRequestDto registrationDto = new RegisterRequestDto(
+                "new@platformzeta.com",
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null,
+                null
+        );
         User mockSavedUser = new User();
         mockSavedUser.setEmail("new@platformzeta.com");
-        when(userService.registerUser(any(UserDto.class))).thenReturn(mockSavedUser);
+        when(userService.registerUser(any(RegisterRequestDto.class))).thenReturn(mockSavedUser);
         mockMvc.perform(post("/user/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDto)))

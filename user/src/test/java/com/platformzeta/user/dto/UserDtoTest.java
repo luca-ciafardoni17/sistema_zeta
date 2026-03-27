@@ -11,14 +11,8 @@ public class UserDtoTest {
 
         dto.setId(1L);
         dto.setEmail("mario@rossi.it");
-        dto.setAccountHolder("Mario Rossi");
-        dto.setCountry("Italy");
-        dto.setMobileNumber("3331234567");
 
         assertThat(dto.getId()).isEqualTo(1L);
         assertThat(dto.getEmail()).isEqualTo("mario@rossi.it");
-        assertThat(dto.getAccountHolder()).isEqualTo("Mario Rossi");
-        assertThat(dto.getCountry()).isEqualTo("Italy");
-        assertThat(dto.getMobileNumber()).isEqualTo("3331234567");
     }
 }
