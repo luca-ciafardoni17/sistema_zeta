@@ -18,16 +18,16 @@ services:
       retries: 5
     networks:
       - zeta-net
-  user-db:
+  auth-db:
     image: mysql:latest
-    container_name: zeta_user
+    container_name: zeta_auth
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: zeta_user
+      MYSQL_DATABASE: zeta_auth
     ports:
       - "3307:3306"
     volumes:
-      - user_data:/var/lib/mysql
+      - auth_data:/var/lib/mysql
     healthcheck:
       test: ["CMD", "mysqladmin" ,"ping", "-h", "localhost"]
       interval: 5s
@@ -76,15 +76,15 @@ services:
         condition: service_healthy
     networks:
       - zeta-net
-  user:
-    build: ./user
+  auth:
+    build: auth
     ports:
       - "8081:8081"
     environment:
-      - DATABASE_HOST=user-db
+      - DATABASE_HOST=auth-db
       - DATABASE_PORT=3306
     depends_on:
-      user-db:
+      auth-db:
         condition: service_healthy
     networks:
       - zeta-net
@@ -103,7 +103,7 @@ services:
 
 volumes:
   storage_data:
-  user_data:
+  auth_data:
   userdetails_data:
 
 networks:

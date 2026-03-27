@@ -16,7 +16,7 @@
 
     <modules>
         <module>storage</module>
-        <module>user</module>
+        <module>auth</module>
         <module>userdetails</module>
     </modules>
 
