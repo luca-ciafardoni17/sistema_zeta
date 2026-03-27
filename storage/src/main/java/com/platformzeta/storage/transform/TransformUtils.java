@@ -22,7 +22,6 @@ public class TransformUtils {
                 throw new RuntimeException("Failed to upload file: ", e);
             }
         }
-        storedFile.setEmail(email);
         storedFile.setFileTitle(storedFileRequestDto.fileTitle());
         storedFile.setFileDescription(storedFileRequestDto.fileDescription());
         storedFile.setCreatedBy(email);
