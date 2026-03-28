@@ -19,6 +19,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtUtil jwtUtil;
 
+    /**
+     * Utility filter to permit only requests containing a valid JwtToken
+     * @param request
+     * @param response
+     * @param filterChain
+     * @throws ServletException
+     * @throws IOException
+     */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         String authHeader = request.getHeader("Authorization");

@@ -1,6 +1,7 @@
 package com.platformzeta.auth.exceptions;
 
 import com.platformzeta.auth.dto.ErrorResponseDto;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -34,6 +35,22 @@ public class GlobalExceptionHandler {
         ErrorResponseDto errorResponseDto = new ErrorResponseDto(
                 webRequest.getDescription(false),
                 HttpStatus.INTERNAL_SERVER_ERROR,
+                exception.getMessage(),
+                LocalDateTime.now()
+        );
+        return new ResponseEntity<>(errorResponseDto, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    /**
+     * BadRequestException specific implementation
+     * @param exception
+     * @return
+     */
+    @ExceptionHandler(BadRequestException.class)
+    public ResponseEntity<ErrorResponseDto> handleBadRequestException(Exception exception, WebRequest webRequest) {
+        ErrorResponseDto errorResponseDto = new ErrorResponseDto(
+                webRequest.getDescription(false),
+                HttpStatus.BAD_REQUEST,
                 exception.getMessage(),
                 LocalDateTime.now()
         );

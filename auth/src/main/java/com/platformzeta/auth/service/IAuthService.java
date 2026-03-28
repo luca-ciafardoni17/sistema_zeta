@@ -4,6 +4,7 @@ import com.platformzeta.auth.dto.LoginRequestDto;
 import com.platformzeta.auth.dto.LoginResponseDto;
 import com.platformzeta.auth.dto.RegisterRequestDto;
 import com.platformzeta.auth.entity.User;
+import org.apache.coyote.BadRequestException;
 
 public interface IAuthService {
 
@@ -17,7 +18,7 @@ public interface IAuthService {
      * @param registerRequestDto - auth and anagraphic infos
      * @return - newly created user data
      */
-    User registerUser(RegisterRequestDto registerRequestDto);
+    User registerUser(RegisterRequestDto registerRequestDto) throws BadRequestException;
 
     /**
      * @param oldCredentials - auth infos to change

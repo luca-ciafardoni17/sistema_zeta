@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -84,7 +85,7 @@ public class AuthController {
             )
     })
     @PostMapping("/register")
-    public ResponseEntity<String> apiRegister(@RequestBody RegisterRequestDto registerRequestDto) {
+    public ResponseEntity<String> apiRegister(@RequestBody RegisterRequestDto registerRequestDto) throws BadRequestException {
         User user = authService.registerUser(registerRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("User with email " + user.getEmail() + " created successfully!");
     }

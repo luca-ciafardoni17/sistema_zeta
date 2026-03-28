@@ -14,10 +14,18 @@ import java.nio.charset.StandardCharsets;
 @RequiredArgsConstructor
 public class JwtUtil {
 
+    /**
+     * Secrets store locally, best practice would be generating them runtime or use Hashicorp vault
+     */
     private final Environment env;
     public static final String JWT_SECRET_KEY = "JWT_SECRET";
     public static final String JWT_SECRET_DEFAULT_VALUE = "jxgEQeXHuPq8VdbyYFNkANdudQ53YUn4";
 
+    /**
+     * Utility function extract all claims in Jwt Token (from auth microservice, only email and userId)
+     * @param token
+     * @return
+     */
     public Claims extractAllClaims(String token) {
         String secret = env.getProperty(JWT_SECRET_KEY, JWT_SECRET_DEFAULT_VALUE);
         SecretKey secretKey = Keys.hmacShaKeyFor(secret.getBytes(StandardCharsets.UTF_8));

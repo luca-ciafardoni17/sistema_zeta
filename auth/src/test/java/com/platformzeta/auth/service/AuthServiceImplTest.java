@@ -8,6 +8,7 @@ import com.platformzeta.auth.entity.User;
 import com.platformzeta.auth.repository.AuthRepository;
 import com.platformzeta.auth.service.impl.AuthServiceImpl;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -43,7 +44,7 @@ class AuthServiceImplTest {
     private AuthServiceImpl userService;
 
     @Test
-    void registerUser_Success() {
+    void registerUser_Success() throws BadRequestException {
         RegisterRequestDto registerRequestDto = new RegisterRequestDto(
                 "mario@aruba.it",
                 "securePassword123",
@@ -79,7 +80,7 @@ class AuthServiceImplTest {
                 null
         );
         assertThatThrownBy(() -> userService.registerUser(registerRequestDto))
-                .isInstanceOf(RuntimeException.class)
+                .isInstanceOf(BadRequestException.class)
                 .hasMessageContaining("Email domain must be aruba.it");
     }
 

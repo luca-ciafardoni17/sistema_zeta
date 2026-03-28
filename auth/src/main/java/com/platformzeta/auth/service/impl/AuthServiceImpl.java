@@ -10,6 +10,7 @@ import com.platformzeta.auth.repository.AuthRepository;
 import com.platformzeta.auth.service.IAuthService;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.BeanUtils;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -59,9 +60,9 @@ public class AuthServiceImpl implements IAuthService {
     }
 
     @Override
-    public User registerUser(RegisterRequestDto registerRequestDto) {
+    public User registerUser(RegisterRequestDto registerRequestDto) throws BadRequestException {
         if (!registerRequestDto.email().split("@")[1].equals("aruba.it")) {
-            throw new RuntimeException("Email domain must be aruba.it");
+            throw new BadRequestException("Email domain must be aruba.it");
         }
         Optional<User> existingUser = authRepository.findByEmail(registerRequestDto.email());
         if (existingUser.isPresent()) {

@@ -1,6 +1,5 @@
 package com.platformzeta.storage.service.impl;
 
-import com.platformzeta.storage.config.security.JwtUtil;
 import com.platformzeta.storage.dto.StoredFileDetailsDto;
 import com.platformzeta.storage.dto.StoredFileRequestDto;
 import com.platformzeta.storage.entity.StoredFile;
@@ -15,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 import tools.jackson.databind.ObjectMapper;
 
 import java.io.IOException;
+import java.nio.file.AccessDeniedException;
 import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
@@ -31,7 +31,7 @@ public class StoredFileServiceImpl implements IStoredFileService {
     @Transactional
     public boolean createStoredFile(String storedFileRequestJson, MultipartFile file) {
         String email = (String) SecurityContextHolder.getContext().getAuthentication().getCredentials();
-        if (!email.endsWith("@aruba.it")) {
+        if (!email.endsWith("@aruba.it") || file.isEmpty()) {
             return false;
         }
         ObjectMapper objectMapper = new ObjectMapper();
@@ -42,11 +42,11 @@ public class StoredFileServiceImpl implements IStoredFileService {
     }
 
     @Override
-    public Optional<?> getStoredFile(Long id, Boolean binaryData) {
+    public Optional<?> getStoredFile(Long id, Boolean binaryData) throws AccessDeniedException {
         Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         StoredFile storedFile = storedFileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found"));
         if (userId != storedFile.getUserId()) {
-            throw new RuntimeException("Current user is not authorized to download requested file!");
+            throw new AccessDeniedException("Current user is not authorized to download requested file!");
         }
         if (binaryData) {
             return Optional.of(TransformUtils.transformEntityToDto(storedFile));
@@ -68,11 +68,11 @@ public class StoredFileServiceImpl implements IStoredFileService {
 
     @Override
     @Transactional
-    public boolean modifyStoredFile(Long id, String storedFileRequestJson, MultipartFile file) {
+    public boolean modifyStoredFile(Long id, String storedFileRequestJson, MultipartFile file) throws AccessDeniedException {
         Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         StoredFile foundStoredFile = storedFileRepository.findById(id).orElseThrow(() -> new RuntimeException("No file found for given id: " + id));
         if (userId != foundStoredFile.getUserId()) {
-            throw new RuntimeException("Current user is not authorized to modify this file");
+            throw new AccessDeniedException("Current user is not authorized to modify this file");
         }
         ObjectMapper objectMapper = new ObjectMapper();
         StoredFileRequestDto storedFileRequestDto = objectMapper.readValue(storedFileRequestJson, StoredFileRequestDto.class);
@@ -105,11 +105,11 @@ public class StoredFileServiceImpl implements IStoredFileService {
 
     @Override
     @Transactional
-    public void deleteStoredFile(Long id) {
+    public void deleteStoredFile(Long id) throws AccessDeniedException {
         Long userId = Long.valueOf(Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName());
         StoredFile storedFile = storedFileRepository.findById(id).orElseThrow(() -> new RuntimeException("File not found!"));
         if (userId != storedFile.getUserId()) {
-            throw new RuntimeException("Current user is not authorized to delete this file");
+            throw new AccessDeniedException("Current user is not authorized to delete this file");
         }
         storedFileRepository.delete(storedFile);
     }

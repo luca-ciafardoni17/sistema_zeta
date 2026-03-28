@@ -1,7 +1,6 @@
 package com.platformzeta.storage.config;
 
 import com.platformzeta.storage.config.security.JwtAuthenticationFilter;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -9,8 +8,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
@@ -27,6 +24,10 @@ public class StorageSecurityConfig {
 
     private final JwtAuthenticationFilter jwtFilter;
 
+    /**
+     * Definition of all security filters, if a JWT token is provided and valid then all methods are callable
+     * @return
+     */
     @Bean
     SecurityFilterChain customSecurityFilterChain(HttpSecurity http) {
         return http
@@ -42,6 +43,10 @@ public class StorageSecurityConfig {
                 .build();
     }
 
+    /**
+     * Dummy cors configuration for a requesting client app
+     * @return
+     */
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration config = new CorsConfiguration();

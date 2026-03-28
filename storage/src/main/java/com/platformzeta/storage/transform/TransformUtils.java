@@ -35,6 +35,7 @@ public class TransformUtils {
 
     public static StoredFileDto transformEntityToDto(StoredFile storedFile) {
         return new StoredFileDto(
+                storedFile.getId(),
                 storedFile.getFileTitle(),
                 storedFile.getFileDescription(),
                 storedFile.getFileName(),
