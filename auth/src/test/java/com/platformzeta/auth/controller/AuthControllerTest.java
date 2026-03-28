@@ -57,7 +57,7 @@ public class AuthControllerTest {
                 "eyJhbGciOiJIUzI1NiJ...ecc...ecc..."
         );
         when(userService.loginUser(any(LoginRequestDto.class))).thenReturn(response);
-        mockMvc.perform(post("/user/login")
+        mockMvc.perform(post("/auth/login")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isOk())
@@ -80,7 +80,7 @@ public class AuthControllerTest {
         User mockSavedUser = new User();
         mockSavedUser.setEmail("new@platformzeta.com");
         when(userService.registerUser(any(RegisterRequestDto.class))).thenReturn(mockSavedUser);
-        mockMvc.perform(post("/user/register")
+        mockMvc.perform(post("/auth/register")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(registrationDto)))
                 .andExpect(status().isCreated())
@@ -97,7 +97,7 @@ public class AuthControllerTest {
                 "new-jwt-token"
         );
         when(userService.updateCredentials(any(String.class), any(String.class))).thenReturn(response);
-        mockMvc.perform(multipart(HttpMethod.PUT, "/user")
+        mockMvc.perform(multipart(HttpMethod.PUT, "/auth")
                         .file(new MockMultipartFile("oldCredentials", "", "application/json", oldCredsJson.getBytes()))
                         .file(new MockMultipartFile("newCredentials", "", "application/json", newCredsJson.getBytes())))
                 .andExpect(status().isOk())
@@ -109,7 +109,7 @@ public class AuthControllerTest {
     void deleteUser_ShouldReturnOk_WhenUserExists() throws Exception {
         LoginRequestDto credentials = new LoginRequestDto("mario.rossi@aruba.it", "securePassword@123");
 
-        mockMvc.perform(delete("/user")
+        mockMvc.perform(delete("/auth")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(credentials)))
                 .andExpect(status().isOk())
