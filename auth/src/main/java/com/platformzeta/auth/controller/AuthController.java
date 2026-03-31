@@ -13,6 +13,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.coyote.BadRequestException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
+@Slf4j
 public class AuthController {
 
     private final IAuthService authService;
@@ -56,6 +58,7 @@ public class AuthController {
     })
     @PostMapping( "/login")
     public ResponseEntity<LoginResponseDto> apiLogin(@RequestBody LoginRequestDto loginRequestDto) {
+        log.info("Calling apiLogin API (POST /login)");
         LoginResponseDto loginResponseDto = authService.loginUser(loginRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(loginResponseDto);
     }
@@ -86,6 +89,7 @@ public class AuthController {
     })
     @PostMapping("/register")
     public ResponseEntity<String> apiRegister(@RequestBody RegisterRequestDto registerRequestDto) throws BadRequestException {
+        log.info("Calling apiRegister API (POST /register)");
         User user = authService.registerUser(registerRequestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body("User with email " + user.getEmail() + " created successfully!");
     }
@@ -119,6 +123,7 @@ public class AuthController {
             @RequestPart(value = "oldCredentials") String oldCredentialsJson,
             @RequestPart(value = "newCredentials") String newCredentialsJson
     ) {
+        log.info("Calling updateCredentials API (PUT /)");
         LoginResponseDto newCredLoginResponseDto = authService.updateCredentials(oldCredentialsJson, newCredentialsJson);
         return ResponseEntity.status(HttpStatus.OK).body(newCredLoginResponseDto);
     }
@@ -149,6 +154,7 @@ public class AuthController {
     })
     @DeleteMapping("")
     public ResponseEntity<String> deleteUser(@RequestBody LoginRequestDto credentials) {
+        log.info("Calling deleteUser API (DELETE /)");
         authService.deleteUser(credentials);
         return ResponseEntity.status(HttpStatus.OK).body("User " + credentials.email() + " deleted successfully");
     }

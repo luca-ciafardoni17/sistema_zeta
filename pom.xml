@@ -17,7 +17,17 @@
     <modules>
         <module>storage</module>
         <module>auth</module>
-        <module>userdetails</module>
     </modules>
+
+    <build>
+        <resources>
+            <resource>
+                <directory>src/main/resources</directory>
+                <includes>
+                    <include>**/*</include>
+                </includes>
+            </resource>
+        </resources>
+    </build>
 
 </project>

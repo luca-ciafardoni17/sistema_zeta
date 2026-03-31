@@ -14,6 +14,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.annotation.Nullable;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -33,6 +34,7 @@ import java.util.Optional;
 @RestController
 @RequestMapping("/stored-file")
 @RequiredArgsConstructor
+@Slf4j
 public class StoredFileController {
 
     private final IStoredFileService storedFileService;
@@ -66,6 +68,7 @@ public class StoredFileController {
             @RequestPart(value = "storedFileRequest") String storedFileRequestJson,
             @NonNull @RequestPart(value = "file") MultipartFile file
     ) {
+        log.info("Calling createStoredFile API (GET /stored-file)");
         boolean isCreated = storedFileService.createStoredFile(storedFileRequestJson, file);
         if (isCreated) {
             return ResponseEntity.status(HttpStatus.CREATED).body("File successfully stored");
@@ -103,6 +106,7 @@ public class StoredFileController {
     })
     @GetMapping("/{id}")
     public ResponseEntity<?> getStoredFile(@PathVariable Long id) throws AccessDeniedException {
+        log.info("Calling getStoredFile API (GET /stored-file/" + id +")");
         Optional<StoredFileDto> storedFileDto = (Optional<StoredFileDto>) storedFileService.getStoredFile(id, true);
         if (storedFileDto.isPresent()) {
             byte[] file = storedFileDto.get().fileData();
@@ -146,6 +150,7 @@ public class StoredFileController {
     })
     @GetMapping("/{id}/details")
     public ResponseEntity<?> getStoredFileDetails(@PathVariable Long id) throws AccessDeniedException {
+        log.info("Calling getStoredFileDetails API (GET /stored-file/" + id +"/details)");
         Optional<?> storedFileDto = storedFileService.getStoredFile(id, false);
         if (storedFileDto.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(storedFileDto.get());
@@ -182,7 +187,8 @@ public class StoredFileController {
             )
     })
     @GetMapping("/details")
-    public ResponseEntity<?> getStoredFileDetails() {
+    public ResponseEntity<?> getAllStoredFileDetails() {
+        log.info("Calling getAllStoredFileDetails API (GET /stored-file/details)");
         Optional<List<StoredFileDetailsDto>> storedFileDto = storedFileService.getStoredFilesDetail();
         if (storedFileDto.isPresent()) {
             return ResponseEntity.status(HttpStatus.OK).body(storedFileDto.get());
@@ -221,6 +227,7 @@ public class StoredFileController {
             @RequestPart(value = "storedFileRequest") String storedFileRequestJson,
             @Nullable @RequestPart(value = "file") MultipartFile file
     ) throws IOException {
+        log.info("Calling updateStoredFile API (PUT /stored-file/ " + id + ")");
         boolean isModified = storedFileService.modifyStoredFile(id, storedFileRequestJson, file);
         if (isModified) {
             return ResponseEntity.status(HttpStatus.OK).body("Stored file updated successfully!");
@@ -255,6 +262,7 @@ public class StoredFileController {
     })
     @DeleteMapping("/{id}")
     public ResponseEntity<String> deleteStoredFile(@PathVariable Long id) throws AccessDeniedException {
+        log.info("Calling deleteStoredFile API (DELETE /stored-file/ " + id + ")");
         storedFileService.deleteStoredFile(id);
         return ResponseEntity.status(HttpStatus.OK).body("Stored file deleted successfully!");
     }
